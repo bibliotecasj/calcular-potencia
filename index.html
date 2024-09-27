@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Potência</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        h1 {
+            text-align: center;
+            color: #007BFF;
+        }
+        button {
+            padding: 10px 15px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007BFF;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        canvas {
+            max-width: 600px;
+            margin: 20px auto;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: white;
+        }
+        #dadosPotencia {
+            text-align: center;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Calculadora de Potência</h1>
+    <div id="dadosPotencia"></div>
+    <button onclick="obterDados()">Obter Dados</button>
+
+    <canvas id="graficoPotencia"></canvas>
+
+    <script>
+        const potencias = [];
+        const tempos = [];
+        let tempoAtual = 0;
+        let grafico;
+
+        function calcularPotencia(corrente, tensao) {
+            return (corrente * tensao) / 1000;
+        }
+
+        async function obterDados() {
+            try {
+                const response = await fetch('http://<IP_DO_SEU_ESP>/dados'); // Substitua pelo IP do seu ESP
+                const data = await response.json();
+                
+                const potencia = calcularPotencia(data.corrente, data.tensao);
+                potencias.push(potencia);
+                tempos.push(tempoAtual++);
+
+                document.getElementById('dadosPotencia').innerText = `Potência: ${potencia.toFixed(2)} kW`;
+                gerarGrafico();
+            } catch (error) {
+                console.error('Erro ao obter dados:', error);
+            }
+        }
+
+        function gerarGrafico() {
+            const ctx = document.getElementById('graficoPotencia').getContext('2d');
+
+            if (grafico) {
+                grafico.destroy(); // Destrói o gráfico anterior para atualizar
+            }
+
+            grafico = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: tempos,
+                    datasets: [{
+                        label: 'Potência (kW)',
+                        data: potencias,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderWidth: 2,
+                        fill: true,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Potência (kW)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Tempo (medições)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(tooltipItem) {
+                                    return `Potência: ${tooltipItem.raw.toFixed(2)} kW`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
