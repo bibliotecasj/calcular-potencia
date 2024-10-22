@@ -97,8 +97,8 @@
 
         // Valores de consumo diário em kWh para os 30 dias
         const consumoDiario = [
-            4.5, 4.3, 5.1, 5.0, 6.2, 6.7, 7.8,
-            6.0, 6.5, 7.6, 8.3, 7.9, 6.1, 5.8,
+            6.5, 6.3, 5.8, 5.4, 6.2, 6.7, 7.8,
+            7.0, 6.5, 7.6, 8.3, 7.9, 6.1, 5.8,
             6.4, 7.0, 6.5, 8.3, 7.2, 6.6, 6.7,
             6.4, 7.4, 8.1, 6.5, 5.9, 6.2, 6.6,
             5.0, 5.1, 7.3
@@ -133,7 +133,7 @@
                 labelsPotencia.length = 0; // Limpa os rótulos para reiniciar o gráfico
                 graficoPotencia.data.datasets[0].data.length = 0; // Limpa os dados do gráfico de potência
             }
-        }, 3600000); // Atualiza a cada 1 hora (3600000 ms)
+        }, 120000); // Atualiza a cada 2 minutos, 1 hora = (3600000 ms)
 
         // Gráfico de Consumo Diário
         let graficoConsumo; // Variável global para o gráfico
