@@ -63,7 +63,7 @@
         const dataPotencia = {
             labels: labelsPotencia,
             datasets: [{
-                label: 'Potência (kW)',
+                label: 'Potência (kWh)',
                 data: [],
                 borderColor: 'rgba(75, 192, 192, 1)',
                 borderWidth: 2,
@@ -83,6 +83,10 @@
                         }
                     },
                     y: {
+                        title: {
+                            display: true,
+                            text: 'Consumo (kWh)'
+                        },
                         beginAtZero: true
                     }
                 }
@@ -92,7 +96,7 @@
         const graficoPotencia = new Chart(ctxPotencia, configPotencia);
 
         let tempo = 0; // Início do tempo em horas
-        let potenciaTotal = 0; // Acumulador de potência total
+        let potenciaTotal = 0; // Acumulador de potência total em kWh
         let diaAtual = 0; // Contador de dias
 
         // Valores de consumo diário em kWh para os 30 dias
@@ -104,16 +108,18 @@
             5.0, 5.1, 7.3
         ];
 
+        // Atualiza o gráfico de Potência em Tempo Real a cada hora (simulado a cada 2 minutos)
         setInterval(() => {
             if (tempo < 24) {
                 tempo += 1; // Incrementa o tempo em horas
                 labelsPotencia.push(tempo.toFixed(0)); // Adiciona o novo tempo aos rótulos
                 const novaPotencia = (Math.random() * (3 - 0.5) + 0.5).toFixed(2); // Simula a potência entre 0.5 e 3 kW
-                graficoPotencia.data.datasets[0].data.push(novaPotencia); // Adiciona nova potência
+                const potenciaEmKwh = (parseFloat(novaPotencia) * 1).toFixed(2); // Consumo em kWh (potência * 1 hora)
+                graficoPotencia.data.datasets[0].data.push(potenciaEmKwh); // Adiciona o valor de kWh
                 graficoPotencia.update(); // Atualiza o gráfico
 
-                // Acumula a potência para o dia atual
-                potenciaTotal += parseFloat(novaPotencia); // Converte para kWh por hora
+                // Acumula o consumo para o dia atual
+                potenciaTotal += parseFloat(potenciaEmKwh); // Acumula o consumo
 
                 // Mantém apenas os últimos 24 pontos (equivalente a 24 horas)
                 if (labelsPotencia.length > 24) {
@@ -133,7 +139,7 @@
                 labelsPotencia.length = 0; // Limpa os rótulos para reiniciar o gráfico
                 graficoPotencia.data.datasets[0].data.length = 0; // Limpa os dados do gráfico de potência
             }
-        }, 120000); // Atualiza a cada 2 minutos, 1 hora = (3600000 ms)
+        }, 120000); // Atualiza a cada 2 minutos (simulação de 1 hora real)
 
         // Gráfico de Consumo Diário
         let graficoConsumo; // Variável global para o gráfico
@@ -159,7 +165,11 @@
                 options: {
                     scales: {
                         y: {
-                            beginAtZero: true
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Consumo (kWh)'
+                            }
                         }
                     }
                 }
