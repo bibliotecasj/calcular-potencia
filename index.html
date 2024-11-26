@@ -101,14 +101,14 @@
 
         // Valores de consumo diário em kWh para os 30 dias
         const consumoDiario = [
-            6.5, 6.3, 5.8, 5.4, 6.2, 6.7, 7.8,
-            7.0, 6.5, 7.6, 8.3, 7.9, 6.1, 5.8,
-            6.4, 7.0, 6.5, 8.3, 7.2, 6.6, 6.7,
-            6.4, 7.4, 8.1, 6.5, 5.9, 6.2, 6.6,
-            5.0, 5.1, 7.3
+            3.5, 3.7, 3.8, 3.4, 3.9, 3.5, 4.0,
+            4.3, 4.5, 3.8, 4.3, 3.9, 4.1, 3.8,
+            3.4, 3.9, 4.5, 3.3, 4.2, 3.6, 3.7,
+            4.4, 4.0, 4.2, 3.6, 3.9, 4.1, 3.8,
+            4.0, 4.1, 4.3
         ];
 
-        // Atualiza o gráfico de Potência em Tempo Real a cada hora (simulado a cada 2 minutos)
+        // Atualiza o gráfico de Potência em Tempo Real a cada 60 minutos (3600000 ms)
         setInterval(() => {
             if (tempo < 24) {
                 tempo += 1; // Incrementa o tempo em horas
@@ -139,7 +139,7 @@
                 labelsPotencia.length = 0; // Limpa os rótulos para reiniciar o gráfico
                 graficoPotencia.data.datasets[0].data.length = 0; // Limpa os dados do gráfico de potência
             }
-        }, 120000); // Atualiza a cada 2 minutos (simulação de 1 hora real)
+        }, 3600000); // Atualiza a cada 1 hora (3600000 ms)
 
         // Gráfico de Consumo Diário
         let graficoConsumo; // Variável global para o gráfico
