@@ -3,26 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gráficos de Potência e Consumo</title>
+    <title>Gráficos de Consumo Diário</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* Estilos */
-        #dynRectangle1 {
-            width: 300px;
-            height: 12px;
-            background-color: rgba(255, 0, 0, 0.863);
-            z-index: -1;
-            margin-top: 1px;
-            border: 3px solid black;
-        }
-        #dynRectangle2 {
-            width: 200px;
-            height: 12px;
-            background-color: rgba(0, 0, 255, 0.534);
-            z-index: -1;
-            margin-top: 1px;
-            border: 3px solid black;
-        }
         body {
             font-family: Arial, sans-serif;
             text-align: center;
@@ -31,8 +14,8 @@
         canvas {
             margin: 20px auto;
             display: block;
-            width: 800px; /* Largura dos gráficos */
-            height: 400px; /* Altura dos gráficos */
+            width: 800px;
+            height: 400px;
         }
         #buttons {
             margin: 20px 0;
@@ -43,9 +26,7 @@
     </style>
 </head>
 <body>
-    <h1>Consumo de Energia Elétrica Numa Casa</h1>
-
-   
+    <h1>Consumo de Energia Elétrica</h1>
     <h2>Gráfico de Consumo Diário</h2>
     <input type="number" id="numDias" min="1" max="30" placeholder="Número de dias (1 a 30)" />
     <div id="buttons">
@@ -55,49 +36,9 @@
     <canvas id="graficoConsumo"></canvas>
 
     <script>
-        // Gráfico de Potência em Tempo Real
-        const ctxPotencia = document.getElementById('graficoPotencia').getContext('2d');
-        const labelsPotencia = [];
-        const dataPotencia = {
-            labels: labelsPotencia,
-            datasets: [{
-                label: 'Potência (kWh)',
-                data: [],
-                borderColor: 'rgba(75, 192, 192, 1)',
-                borderWidth: 2,
-                fill: false
-            }]
-        };
+        let graficoConsumo;
 
-        const configPotencia = {
-            type: 'line',
-            data: dataPotencia,
-            options: {
-                scales: {
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Horas'
-                        }
-                    },
-                    y: {
-                        title: {
-                            display: true,
-                            text: 'Consumo (kWh)'
-                        },
-                        beginAtZero: true
-                    }
-                }
-            }
-        };
-
-        const graficoPotencia = new Chart(ctxPotencia, configPotencia);
-
-        let tempo = 0; // Início do tempo em horas
-        let potenciaTotal = 0; // Acumulador de potência total em kWh
-        let diaAtual = 0; // Contador de dias
-
-        // Valores de consumo diário em kWh para os 30 dias
+        // Dados de consumo diário (exemplo)
         const consumoDiario = [
             3.5, 3.7, 3.8, 3.4, 3.9, 4.4, 4.0,
             3.6, 3.5, 3.8, 3.9, 3.9, 4.1, 4.2,
@@ -106,58 +47,24 @@
             4.0, 3.6, 3.6
         ];
 
-        // Atualiza o gráfico de Potência em Tempo Real a cada 60 minutos (3600000 ms)
-        setInterval(() => {
-            if (tempo < 24) {
-                tempo += 1; // Incrementa o tempo em horas
-                labelsPotencia.push(tempo.toFixed(0)); // Adiciona o novo tempo aos rótulos
-                const novaPotencia = (Math.random() * (3 - 0.5) + 0.5).toFixed(2); // Simula a potência entre 0.5 e 3 kW
-                const potenciaEmKwh = (parseFloat(novaPotencia) * 1).toFixed(2); // Consumo em kWh (potência * 1 hora)
-                graficoPotencia.data.datasets[0].data.push(potenciaEmKwh); // Adiciona o valor de kWh
-                graficoPotencia.update(); // Atualiza o gráfico
-
-                // Acumula o consumo para o dia atual
-                potenciaTotal += parseFloat(potenciaEmKwh); // Acumula o consumo
-
-                // Mantém apenas os últimos 24 pontos (equivalente a 24 horas)
-                if (labelsPotencia.length > 24) {
-                    labelsPotencia.shift(); // Remove o primeiro rótulo
-                    graficoPotencia.data.datasets[0].data.shift(); // Remove o primeiro valor
-                }
-            } else {
-                // Após 24 horas, registra o consumo do dia
-                consumoDiario[diaAtual] = potenciaTotal; // Registra o total acumulado no dia
-
-                // Avança para o próximo dia, sobrescrevendo após o dia 30
-                diaAtual = (diaAtual + 1) % 30; // Sobrescreve dia por dia após 30 dias
-                
-                // Reseta o acumulador para o próximo dia
-                potenciaTotal = 0;
-                tempo = 0; // Reseta o tempo para o próximo dia
-                labelsPotencia.length = 0; // Limpa os rótulos para reiniciar o gráfico
-                graficoPotencia.data.datasets[0].data.length = 0; // Limpa os dados do gráfico de potência
-            }
-        }, 3600000); // Atualiza a cada 1 hora (3600000 ms)
-
-        // Gráfico de Consumo Diário
-        let graficoConsumo; // Variável global para o gráfico
-
-        // Função para gerar gráfico de consumo diário
         function gerarGraficoConsumo(numDias) {
             const ctxConsumo = document.getElementById('graficoConsumo').getContext('2d');
-            ctxConsumo.clearRect(0, 0, ctxConsumo.canvas.width, ctxConsumo.canvas.height); // Limpa o canvas antes de desenhar
+            
+            if (graficoConsumo) {
+                graficoConsumo.destroy(); // Remove o gráfico anterior
+            }
 
             graficoConsumo = new Chart(ctxConsumo, {
-                type: 'line', // Gráfico linear
+                type: 'line',
                 data: {
-                    labels: Array.from({ length: numDias }, (_, i) => `Dia ${i + 1}`), // Eixo X: Dias
+                    labels: Array.from({ length: numDias }, (_, i) => `Dia ${i + 1}`),
                     datasets: [{
                         label: 'Consumo (kWh)',
-                        data: consumoDiario.slice(0, numDias), // Pega apenas os dados dos dias selecionados
+                        data: consumoDiario.slice(0, numDias),
                         backgroundColor: 'rgba(75, 192, 192, 0.2)',
                         borderColor: 'rgba(75, 192, 192, 1)',
                         borderWidth: 2,
-                        fill: true // Preenchendo a área sob a linha
+                        fill: true
                     }]
                 },
                 options: {
@@ -174,7 +81,6 @@
             });
         }
 
-        // Gerar Gráfico de Consumo Diário
         document.getElementById('gerarGrafico').addEventListener('click', () => {
             const numDias = parseInt(document.getElementById('numDias').value);
 
@@ -183,15 +89,16 @@
                 return;
             }
 
-            gerarGraficoConsumo(numDias); // Chama a função para gerar o gráfico
+            gerarGraficoConsumo(numDias);
         });
 
-        // Limpar Gráfico de Consumo Diário
         document.getElementById('limparGrafico').addEventListener('click', () => {
+            if (graficoConsumo) {
+                graficoConsumo.destroy(); // Destroi o gráfico atual
+            }
             const ctxConsumo = document.getElementById('graficoConsumo').getContext('2d');
             ctxConsumo.clearRect(0, 0, ctxConsumo.canvas.width, ctxConsumo.canvas.height); // Limpa o canvas
             document.getElementById('numDias').value = ''; // Limpa o campo de entrada
-            graficoConsumo && graficoConsumo.destroy(); // Destrói o gráfico existente, se houver
         });
     </script>
 </body>
